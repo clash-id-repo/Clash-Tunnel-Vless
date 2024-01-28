@@ -1,12 +1,11 @@
-// <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:02 UTC<!--GAMFC-END-->.
 // @ts-ignore
 import { connect } from 'cloudflare:sockets';
 
 // How to generate your own UUID:
 // [Windows] Press "Win + R", input cmd and run:  Powershell -NoExit -Command "[guid]::NewGuid()"
-let userID = '6e5ab0cf-f2b4-4ef4-9287-c8a206f07dc9';
+let userID = 'c3c9469b-bafe-43e0-bdd1-63fe3a4a11a0';
 
-const proxyIPs = ['8.219.238.148'];
+const proxyIPs = ['8.219.238.148', '23.162.136.169'];
 
 let proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
 
@@ -39,13 +38,14 @@ export default {
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
 				const url = new URL(request.url);
 				switch (url.pathname) {
-					case '/cf':
+					case `/cf`: {
 						return new Response(JSON.stringify(request.cf, null, 4), {
 							status: 200,
 							headers: {
 								"Content-Type": "application/json;charset=utf-8",
 							},
 						});
+					}
 					case `/${userID_Path}`: {
 						const vlessConfig = getVLESSConfig(userID, request.headers.get('Host'));
 						return new Response(`${vlessConfig}`, {
@@ -54,72 +54,46 @@ export default {
 								"Content-Type": "text/html; charset=utf-8",
 							}
 						});
-					}
+					};
 					case `/sub/${userID_Path}`: {
 						const url = new URL(request.url);
 						const searchParams = url.searchParams;
-						let vlessConfig = createVLESSSub(userID, request.headers.get('Host'));
-						// If 'format' query param equals to 'clash', convert config to base64
-						if (searchParams.get('format') === 'clash') {
-							vlessConfig = btoa(vlessConfig);
-						}
+						const vlessSubConfig = createVLESSSub(userID, request.headers.get('Host'));
 						// Construct and return response object
-						return new Response(vlessConfig, {
+						return new Response(btoa(vlessSubConfig), {
 							status: 200,
 							headers: {
 								"Content-Type": "text/plain;charset=utf-8",
 							}
 						});
-					}
-					case `/bestip/${userID_Path}`: {
-						const bestiplink = `https://sub.xf.free.hr/auto?host=${request.headers.get('Host')}&uuid=${userID_Path}`
-						const reqHeaders = new Headers(request.headers);
-						const bestipresponse = await fetch(bestiplink, { redirect: 'manual', headers: reqHeaders, });
-						// Construct and return response object
-						return bestipresponse
-					}
+					};
 					default:
 						// return new Response('Not found', { status: 404 });
-						// For any other path, reverse proxy to 'www.fmprc.gov.cn' and return the original response, caching it in the process
-						const hostnames = ['www.fmprc.gov.cn', 'www.xuexi.cn', 'www.gov.cn', 'mail.gov.cn', 'www.mofcom.gov.cn', 'www.gfbzb.gov.cn', 'www.miit.gov.cn', 'www.12377.cn'];
-						url.hostname = hostnames[Math.floor(Math.random() * hostnames.length)];
-						url.protocol = 'https:';
-
+						// For any other path, reverse proxy to 'ramdom website' and return the original response, caching it in the process
+						const randomHostname = cn_hostnames[Math.floor(Math.random() * cn_hostnames.length)];
 						const newHeaders = new Headers(request.headers);
-						newHeaders.set('cf-connecting-ip', newHeaders.get('x-forwarded-for') || newHeaders.get('cf-connecting-ip'));
-						newHeaders.set('x-forwarded-for', newHeaders.get('cf-connecting-ip'));
-						newHeaders.set('x-real-ip', newHeaders.get('cf-connecting-ip'));
-						newHeaders.set('referer', 'https://www.google.com/q=edtunnel');
-
-						request = new Request(url, {
+						newHeaders.set('cf-connecting-ip', '1.2.3.4');
+						newHeaders.set('x-forwarded-for', '1.2.3.4');
+						newHeaders.set('x-real-ip', '1.2.3.4');
+						newHeaders.set('referer', 'https://www.google.com/search?q=edtunnel');
+						// Use fetch to proxy the request to 15 different domains
+						const proxyUrl = 'https://' + randomHostname + url.pathname + url.search;
+						let modifiedRequest = new Request(proxyUrl, {
 							method: request.method,
 							headers: newHeaders,
 							body: request.body,
-							redirect: request.redirect,
+							redirect: 'manual',
 						});
-
-						const cache = caches.default;
-						let response = await cache.match(request);
-
-						if (!response) {
-							try {
-								response = await fetch(request, { redirect: 'manual' });
-							} catch (err) {
-								url.protocol = 'http:';
-								url.hostname = hostnames[Math.floor(Math.random() * hostnames.length)];
-								request = new Request(url, {
-									method: request.method,
-									headers: newHeaders,
-									body: request.body,
-									redirect: request.redirect,
-								});
-								response = await fetch(request, { redirect: 'manual' });
-							}
-
-							const cloneResponse = response.clone();
-							ctx.waitUntil(cache.put(request, cloneResponse));
+						const proxyResponse = await fetch(modifiedRequest, { redirect: 'manual' });
+						// Check for 302 or 301 redirect status and return an error response
+						if ([301, 302].includes(proxyResponse.status)) {
+							return new Response(`Redirects to ${randomHostname} are not allowed.`, {
+								status: 403,
+								statusText: 'Forbidden',
+							});
 						}
-						return response;
+						// Return the response from the proxy server
+						return proxyResponse;
 				}
 			} else {
 				return await vlessOverWSHandler(request);
@@ -725,13 +699,11 @@ function getVLESSConfig(userIDs, hostName) {
 	// Prepare output array
 	let output = [];
 	let header = [];
-	const clash_link = `https://subconverter.do.xn--b6gac.eu.org/sub?target=clash&url=https://${hostName}/sub/${userIDArray[0]}?format=clash&insert=false&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-	header.push(`\n<p align="center"><img src="https://cloudflare-ipfs.com/ipfs/bafybeigd6i5aavwpr6wvnwuyayklq3omonggta4x2q7kpmgafj357nkcky" alt="图片描述" style="margin-bottom: -50px;">`);
-	header.push(`\n<b style=" font-size: 15px;" >Welcome! This function generates configuration for VLESS protocol. If you found this useful, please check our GitHub project for more:</b>\n`);
-	header.push(`<b style=" font-size: 15px;" >欢迎！这是生成 VLESS 协议的配置。如果您发现这个项目很好用，请查看我们的 GitHub 项目给我一个star：</b>\n`);
-	header.push(`\n<a href="https://github.com/3Kmfi6HP/EDtunnel" target="_blank">EDtunnel - https://github.com/3Kmfi6HP/EDtunnel</a>\n`);
-	header.push(`\n<iframe src="https://ghbtns.com/github-btn.html?user=USERNAME&repo=REPOSITORY&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>\n\n`.replace(/USERNAME/g, "3Kmfi6HP").replace(/REPOSITORY/g, "EDtunnel"));
-	header.push(`<a href="//${hostName}/sub/${userIDArray[0]}" target="_blank">VLESS 节点订阅连接</a>\n<a href="clash://install-config?url=${encodeURIComponent(clash_link)}" target="_blank">Clash 节点订阅连接</a>\n<a href="${clash_link}" target="_blank">Clash 节点订阅连接2</a></p>\n`);
+	const sublink = `https://${hostName}/sub/${userIDArray[0]}?format=clash`
+	const clash_link = `https://api.v1.mk/sub?target=clash&url=${encodeURIComponent(sublink)}&insert=false&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+	header.push(`<p align="center"><img src="https://raw.githubusercontent.com/clash-id-repo/ClashTunnel/main/assets/images/clash-logo.png" alt="Clash" style="margin-bottom: -80px;">`);
+	header.push(`\n\n<b style=" font-size: 15px;" >Hi! This page generates configuration for VLESS protocol.</b>\n`);
+	header.push(`\n<a href="https://arh.my.id" target="_blank">Partner : ARH</a>\n`);
 	header.push(``);
 
 	// Generate output string for each userID
@@ -747,66 +719,88 @@ function getVLESSConfig(userIDs, hostName) {
 	// HTML Head with CSS
 	const htmlHead = `
     <head>
-        <title>EDtunnel: VLESS configuration</title>
-        <meta name="description" content="This is a tool for generating VLESS protocol configurations. Give us a star on GitHub https://github.com/3Kmfi6HP/EDtunnel if you found it useful!">
-		<meta name="keywords" content="EDtunnel, cloudflare pages, cloudflare worker, severless">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta property="og:site_name" content="EDtunnel: VLESS configuration" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="EDtunnel - VLESS configuration and subscribe output" />
-        <meta property="og:description" content="Use cloudflare pages and worker severless to implement vless protocol" />
-        <meta property="og:url" content="https://${hostName}/" />
-        <meta property="og:image" content="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`vless://${userIDs.split(',')[0]}@${hostName}${commonUrlPart}`)}" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="EDtunnel - VLESS configuration and subscribe output" />
-        <meta name="twitter:description" content="Use cloudflare pages and worker severless to implement vless protocol" />
-        <meta name="twitter:url" content="https://${hostName}/" />
-        <meta name="twitter:image" content="https://cloudflare-ipfs.com/ipfs/bafybeigd6i5aavwpr6wvnwuyayklq3omonggta4x2q7kpmgafj357nkcky" />
-        <meta property="og:image:width" content="1500" />
-        <meta property="og:image:height" content="1500" />
+	<title>Clash Tunnel: VLESS Configuration</title>
+	<meta name="description" content="This is a tool for generating VLESS protocol configurations.">
+	<meta name="keywords" content="Clash, cloudflare pages, vless, cloudflare worker, severless">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:site_name" content="Clash Tunnel: VLESS Configuration" />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Clash Tunnel - VLESS Configuration and subscription" />
+	<meta property="og:description" content="This is a tool for generating VLESS protocol configurations" />
+	<meta property="og:url" content="https://${hostName}/" />
+	<meta property="og:image" content="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`vless://${userIDs.split(',')[0]}@${hostName}${commonUrlPart}`)}" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Clash Tunnel - VLESS Configuration and subscription" />
+	<meta name="twitter:description" content="This is a tool for generating VLESS protocol configurations" />
+	<meta name="twitter:url" content="https://${hostName}/" />
+	<meta name="twitter:image" content="https://cloudflare-ipfs.com/ipfs/bafybeigd6i5aavwpr6wvnwuyayklq3omonggta4x2q7kpmgafj357nkcky" />
+	<meta property="og:image:width" content="1500" />
+	<meta property="og:image:height" content="1500" />
 
-        <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            padding: 10px;
-        }
+	<style>
+	body {
+	  font-family: Arial, sans-serif;
+	  background-color: #f0f0f0;
+	  color: #333;
+	  padding: 10px;
+	}
 
-        a {
-            color: #1a0dab;
-            text-decoration: none;
-        }
-		img {
-			max-width: 100%;
-			height: auto;
-		}
-		
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 10px 0;
-        }
-		/* Dark mode */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #333;
-                color: #f0f0f0;
-            }
+	a {
+	  color: #1a0dab;
+	  text-decoration: none;
+	}
 
-            a {
-                color: #9db4ff;
-            }
+	img {
+	  max-width: 100%;
+	  height: auto;
+	}
 
-            pre {
-                background-color: #282a36;
-                border-color: #6272a4;
-            }
-        }
-        </style>
+	pre {
+	  white-space: pre-wrap;
+	  word-wrap: break-word;
+	  background-color: #fff;
+	  border: 1px solid #ddd;
+	  padding: 15px;
+	  margin: 10px 0;
+	}
+
+	/* width */
+	::-webkit-scrollbar {
+	  width: 5px;
+	}
+
+	/* Track */
+	::-webkit-scrollbar-track {
+	  background: #f1f1f1;
+	}
+
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+	  background: #888;
+	}
+
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+	  background: #555;
+	}
+
+	/* Dark mode */
+	@media (prefers-color-scheme: dark) {
+	  body {
+		background-color: #333;
+		color: #f0f0f0;
+	  }
+
+	  a {
+		color: #9db4ff;
+	  }
+
+	  pre {
+		background-color: #282a36;
+		border-color: #6272a4;
+	  }
+	}
+  </style>
     </head>
     `;
 
@@ -870,3 +864,10 @@ function createVLESSSub(userID_Path, hostName) {
 	return output.join('\n');
 }
 
+const cn_hostnames = [
+	'arh.my.id',          // Weibo - A popular social media platform
+//  'www.baidu.com',            // Baidu - The largest search engine in China
+//  'www.qq.com',               // QQ - A widely used instant messaging platform
+//  'www.taobao.com',           // Taobao - An e-commerce website owned by Alibaba Group
+//  'www.tiktok.com',           // TikTok - A Chinese short-form video app
+];
