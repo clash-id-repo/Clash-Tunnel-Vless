@@ -75,7 +75,7 @@ export default {
 						newHeaders.set('cf-connecting-ip', '1.2.3.4');
 						newHeaders.set('x-forwarded-for', '1.2.3.4');
 						newHeaders.set('x-real-ip', '1.2.3.4');
-						newHeaders.set('referer', 'https://www.google.com/search?q=edtunnel');
+						newHeaders.set('referer', 'https://www.google.com/search?q=clashtunnel');
 						// Use fetch to proxy the request to 15 different domains
 						const proxyUrl = 'https://' + randomHostname + url.pathname + url.search;
 						let modifiedRequest = new Request(proxyUrl, {
@@ -699,7 +699,7 @@ function getVLESSConfig(userIDs, hostName) {
 	// Prepare output array
 	let output = [];
 	let header = [];
-	const sublink = `https://${hostName}/sub/${userIDArray[0]}?format=clash`
+	const sublink = `https://${hostName}/vless/sub/${userIDArray[0]}?format=clash`
 	const clash_link = `https://api.v1.mk/sub?target=clash&url=${encodeURIComponent(sublink)}&insert=false&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 	header.push(`<p align="center"><img src="https://raw.githubusercontent.com/clash-id-repo/ClashTunnel/main/assets/images/clashogo.png" alt="Clash" style="margin-bottom: -30px;">`);
 	header.push(`\n\n<b style=" font-size: 15px;" >This page generates configuration details for VLESS protocol.</b>\n`);
@@ -710,15 +710,15 @@ function getVLESSConfig(userIDs, hostName) {
 	userIDArray.forEach((userID) => {
 		const vlessMain = `vless://${userID}@${hostName}${commonUrlPart}`;
 		const vlessSec = `vless://${userID}@${proxyIP}${commonUrlPart}`;
-		output.push(`${separator}\nDETAIL ACCOUNTS\n${separator}`);
+		output.push(`${separator}\n「 ✦ DETAIL ACCOUNTS ✦ \n${separator}`);
 		output.push(`Host: ${hostName}`);
 		output.push(`UUID: ${userID}`);
-		output.push(`Port TLS: 443\n\n`);
-		output.push(`${separator}\nv2ray default ip ✅\n${separator}\n${vlessMain}\n\n`);
-		output.push(`${separator}\nv2ray with best ip ✅\n${separator}\n${vlessSec}\n\n`);
+		output.push(`Port TLS: 443\n${separator}\n\n`);
+		output.push(`${separator}\nv2ray default ip ✅\n${separator}\n${vlessMain}\n${separator}\n\n`);
+		output.push(`${separator}\nv2ray with best ip ✅\n${separator}\n${vlessSec}\n${separator}\n\n`);
 	});
-		output.push(`${separator}\nClash Proxy Provider (configuration format) ✅\n${separator}\nproxy-groups:\n  - name: UseProvider\n	type: select\n	use:\n	  - provider1\n	proxies:\n	  - Proxy\n	  - DIRECT\nproxy-providers:\n  provider1:\n	type: http\n	url: https://${hostName}/sub/${userIDArray[0]}?format=clash\n	interval: 3600\n	path: ./provider1.yaml\n	health-check:\n	  enable: true\n	  interval: 600\n	  # lazy: true\n	  url: http://www.gstatic.com/generate_204\n\n`);
-		output.push(`${separator}\nClash Meta (configuration format) ✅\n${separator}\n     - type: vless\n  name: ${hostName}\n  server: ${hostName}\n  port: 443\n  uuid: ${userID}\n  network: ws\n  tls: true\n  udp: false\n  sni: ${hostName}\n  client-fingerprint: chrome\n  ws-opts:\n    path: "/?ed=2048"\n    headers:\n   host: ${hostName}\n${separator}\n\n`);
+		output.push(`${separator}\nClash Proxy Provider ✅\n${separator}\nproxy-groups:\n  - name: UseProvider\n	type: select\n	use:\n	  - provider1\n	proxies:\n	  - Proxy\n	  - DIRECT\nproxy-providers:\n  provider1:\n	type: http\n	url: https://${hostName}/sub/${userIDArray[0]}?format=clash\n	interval: 3600\n	path: ./provider1.yaml\n	health-check:\n	  enable: true\n	  interval: 600\n	  # lazy: true\n	  url: http://www.gstatic.com/generate_204\n${separator}\n\n`);
+		output.push(`${separator}\nClash Meta ✅\n${separator}\n     - type: vless\n  name: ${hostName}\n  server: ${hostName}\n  port: 443\n  uuid: ${userID}\n  network: ws\n  tls: true\n  udp: false\n  sni: ${hostName}\n  client-fingerprint: chrome\n  ws-opts:\n    path: "/?ed=2048"\n    headers:\n     host: ${hostName}\n${separator}\n\n`);
 	
  	// HTML Head with CSS
 	const htmlHead = `
