@@ -711,7 +711,7 @@ function getVLESSConfig(userIDs, hostName) {
 		const vlessMain = `vless://${userID}@${hostName}${commonUrlPart}`;
 		const vlessSec = `vless://${userID}@${proxyIP}${commonUrlPart}`;
 		output.push(`━━━━━━━━━━━━━━━━━━━━━\nACCOUNT\n━━━━━━━━━━━━━━━━━━━━━`);
-		output.push(`Host: ${hostName}`;
+		output.push(`Host: ${hostName}`);
 		output.push(`UUID: ${userID}`);
 		output.push(`Port TLS: 443`);
 		output.push(`${hashSeparator}\nv2ray default ip\n${separator}\n${vlessMain}\n${separator}`);
