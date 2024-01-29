@@ -701,8 +701,8 @@ function getVLESSConfig(userIDs, hostName) {
 	let header = [];
 	const sublink = `https://${hostName}/sub/${userIDArray[0]}?format=clash`
 	const clash_link = `https://api.v1.mk/sub?target=clash&url=${encodeURIComponent(sublink)}&insert=false&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-	header.push(`<p align="center"><img src="https://raw.githubusercontent.com/clash-id-repo/ClashTunnel/main/assets/images/clashogo.png" alt="Clash" style="margin-bottom: -80px;">`);
-	header.push(`\n\n<b style=" font-size: 15px;" >Detail vmess Accounts. This page generates configuration for VLESS protocol.</b>\n`);
+	header.push(`<p align="center"><img src="https://raw.githubusercontent.com/clash-id-repo/ClashTunnel/main/assets/images/clashogo.png" alt="Clash" style="margin-bottom: -30px;">`);
+	header.push(`\n\n<b style=" font-size: 15px;" >This page generates configuration for VLESS protocol.</b>\n`);
 	header.push(`\n<a href="https://arh.my.id" target="_blank">Partner : ARH</a>\n`);
 	header.push(``);
 
@@ -710,12 +710,12 @@ function getVLESSConfig(userIDs, hostName) {
 	userIDArray.forEach((userID) => {
 		const vlessMain = `vless://${userID}@${hostName}${commonUrlPart}`;
 		const vlessSec = `vless://${userID}@${proxyIP}${commonUrlPart}`;
-		output.push(`━━━━━━━━━━━━━━━━━━━━━\nACCOUNT\n━━━━━━━━━━━━━━━━━━━━━`);
+		output.push(`${separator}\nDETAIL ACCOUNTS\n${separator}`);
 		output.push(`Host: ${hostName}`);
 		output.push(`UUID: ${userID}`);
-		output.push(`Port TLS: 443`);
-		output.push(`${hashSeparator}\nv2ray default ip\n${separator}\n${vlessMain}\n${separator}`);
-		output.push(`${hashSeparator}\nv2ray with best ip\n${separator}\n${vlessSec}\n${separator}`);
+		output.push(`Port TLS: 443\n`);
+		output.push(`${hashSeparator}\nv2ray default ip ✅\n${separator}\n${vlessMain}\n${separator}`);
+		output.push(`${hashSeparator}\nv2ray with best ip ✅\n${separator}\n${vlessSec}\n${separator}`);
 	});
 	output.push(`${hashSeparator}\n# Clash Proxy Provider (configuration format)\nproxy-groups:\n  - name: UseProvider\n	type: select\n	use:\n	  - provider1\n	proxies:\n	  - Proxy\n	  - DIRECT\nproxy-providers:\n  provider1:\n	type: http\n	url: https://${hostName}/sub/${userIDArray[0]}?format=clash\n	interval: 3600\n	path: ./provider1.yaml\n	health-check:\n	  enable: true\n	  interval: 600\n	  # lazy: true\n	  url: http://www.gstatic.com/generate_204\n\n${hashSeparator}`);
 
