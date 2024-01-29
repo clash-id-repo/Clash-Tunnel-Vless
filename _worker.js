@@ -730,10 +730,12 @@ function getVLESSConfig(userIDs, hostName) {
   sni: ${hostName}
   client-fingerprint: chrome
   ws-opts:
-	path: "/?ed=2048"
-	headers:
-	  host: ${hostName}
-${separator}\n${hashSeparator})`;
+    path: "/?ed=2048"
+    headers:
+      host: ${hostName}
+---------------------------------------------------------------
+################################################################
+`;
 	// HTML Head with CSS
 	const htmlHead = `
     <head>
