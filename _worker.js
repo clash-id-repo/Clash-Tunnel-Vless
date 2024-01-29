@@ -691,7 +691,7 @@ async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
 function getVLESSConfig(userIDs, hostName) {
 	const commonUrlPart = `:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
 	const separator = "-----------------------------------------";
-	const hashSeparator = "#####################################";
+	const hashSeparator = "#########################################";
 
 	// Split the userIDs into an array
 	let userIDArray = userIDs.split(',');
@@ -702,7 +702,7 @@ function getVLESSConfig(userIDs, hostName) {
 	const sublink = `https://${hostName}/sub/${userIDArray[0]}?format=clash`
 	const clash_link = `https://api.v1.mk/sub?target=clash&url=${encodeURIComponent(sublink)}&insert=false&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 	header.push(`<p align="center"><img src="https://raw.githubusercontent.com/clash-id-repo/ClashTunnel/main/assets/images/clashogo.png" alt="Clash" style="margin-bottom: -30px;">`);
-	header.push(`\n\n<b style=" font-size: 15px;" >This page generates configuration for VLESS protocol.</b>\n`);
+	header.push(`\n\n<b style=" font-size: 15px;" >This page generates configuration details for VLESS protocol.</b>\n`);
 	header.push(`\n<a href="https://arh.my.id" target="_blank">Partner : ARH</a>\n`);
 	header.push(``);
 
