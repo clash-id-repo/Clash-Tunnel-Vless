@@ -733,7 +733,7 @@ function getVLESSConfig(userIDs, hostName) {
 	path: "/?ed=2048"
 	headers:
 	  host: ${hostName}
-${separator}\n${hashSeparator}
+${separator}\n${hashSeparator})`;
 	// HTML Head with CSS
 	const htmlHead = `
     <head>
