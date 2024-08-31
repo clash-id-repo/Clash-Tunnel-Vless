@@ -869,7 +869,7 @@ function createVLESSSub(userID_Path, hostName) {
 }
 
 const cn_hostnames = [
-	'arh.my.id',          // Weibo - A popular social media platform
+	'vless.clash.id',          // Weibo - A popular social media platform
 //  'www.baidu.com',            // Baidu - The largest search engine in China
 //  'www.qq.com',               // QQ - A widely used instant messaging platform
 //  'www.taobao.com',           // Taobao - An e-commerce website owned by Alibaba Group
