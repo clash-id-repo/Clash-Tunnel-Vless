@@ -12,7 +12,7 @@ export default {
       if (!upgradeHeader || upgradeHeader !== 'websocket') {
         return fetch(request);
       } else {
-    	if (url.pathname.includes('/vl=172.232.238.169')) {
+    	if (url.pathname.includes('/vl=')) {
 		proxyIP = url.pathname.split('=')[1];
 		return await vlessOverWSHandler(request);
 	  } else if (url.pathname.includes('/tr=')) {
